@@ -8,6 +8,11 @@ File   - - - "Options.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define NUM_FLAGS 4
 
 //Enum to be used to index into the flagStates array.
@@ -18,22 +23,9 @@ enum FLAG_LABELS {
     TIME
 };
 
-extern enum FLAG_LABELS flagLabel;
-
-//Array which contains the states flags determined by user-passed args.
-extern int flagStates[NUM_FLAGS];
-
-//Option parameters variables.
-extern char* inputFileParam;
-extern char* outputFileParam;
-extern char* timeParam;
-
-void initFlags();
-
-void setFlags(int argc, char** argv);
+void setFlags(const int argc, char** argv);
 
 int getFlagState(int flag);
-
-int timeParamToInt();
+char* getFlagArg(int flag);
 
 #endif
