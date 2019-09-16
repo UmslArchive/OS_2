@@ -12,5 +12,6 @@ int main(int argc, char** argv) {
     //Option parsing.
     setFlags(argc, argv);
 
+
     return 0;
 }

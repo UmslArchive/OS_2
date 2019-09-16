@@ -11,9 +11,9 @@ static int flagArray[NUM_FLAGS];
 
 static void printFlagArray(); //DEBUG
 
-static char* inputFileParam = NULL;
-static char* outputFileParam = NULL;
-static int timeParam = -1;
+static char* inputFileParam = "input.dat";
+static char* outputFileParam = "output.dat";
+static int timeParam = 10;
 
 //Initialize flags to 0.
 static void initFlags() {
