@@ -5,6 +5,8 @@ Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
 File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include <string.h>
+
 #include "Files.h"
 #include "Options.h"
 
@@ -40,7 +42,7 @@ int readInFile() {
     int currentInt = 0;
 
     //Read the first line and set numLists.
-    if(fscanf(inFile, "%d", &currentInt) > 0) {
+    if(fscanf(inFile, "%d\n", &currentInt) > 0) {
         numLists = currentInt;
         printf("numLists = %d\n", numLists);
     }
@@ -49,6 +51,19 @@ int readInFile() {
     }
         
     //Read each line of the file into a string, then parse for ints.
+    char* line = NULL;
+    int numInts = 0;
+    size_t len = 0;
+    ssize_t read;
+
+    while((read = getline(&line, &len, inFile)) != EOF) {
+        //Parse the line for ints.
+        char* token = strtok(line, " ");
+        while(token != NULL) {
+            printf("%s\n", token);
+            token = strtok(NULL, " ");
+        }
+    }
 
     return 0;
 }
