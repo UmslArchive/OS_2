@@ -5,10 +5,10 @@ Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
 File   - - - "IntegerListQueue.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "Files.h"
-
 #ifndef INTEGERLISTQUEUE_H
 #define INTEGERLISTQUEUE_H
+
+#include "Files.h"
 
 struct IntegerListList;
 
