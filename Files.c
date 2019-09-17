@@ -48,8 +48,7 @@ int readInFile() {
         printf("logParse: Error: Could not read first value from infile\n");
     }
         
-
-    //Read each list of ints
+    //Read each line of the file into a string, then parse for ints.
 
     return 0;
 }
