@@ -1,4 +1,3 @@
 *.o
+*.dat
 logParse
-input.dat
-output.dat
