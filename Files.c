@@ -22,7 +22,7 @@ int readInFile() {
 
     //Check if file exists.
     if(inFile == NULL) {
-        perror("logParse: Error: Invalid infile specified. Could not open.");
+        perror("logParse: Error: Invalid infile specified");
         return -1;
     }
     else {
@@ -30,7 +30,7 @@ int readInFile() {
         fseek(inFile, 0, SEEK_END);
         int size = ftell(inFile);
         if(size == 0) {
-            perror("logParse: Error: Infile is an empty file.");
+            printf("logParse: Error: Infile is an empty file\n");
             return -1;
         }
             
@@ -40,12 +40,12 @@ int readInFile() {
     int currentInt = 0;
 
     //Read the first line and set numLists.
-    if(fscanf(inFile, "%d", &currentInt) != EOF) {
+    if(fscanf(inFile, "%d", &currentInt) > 0) {
         numLists = currentInt;
         printf("numLists = %d\n", numLists);
     }
     else {
-        perror("logParse: Error: Could not read first value from infile.");
+        printf("logParse: Error: Could not read first value from infile\n");
     }
         
 
