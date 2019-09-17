@@ -2,19 +2,15 @@
 Author - - - Colby Ackerman - - - - - - - - - - - - - - - - - - - - - - - - - -
 Class  - - - Operating Systems (CS4760) - - - - - - - - - - - - - - - - - - - -
 Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
-File   - - - "main.c" - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+File   - - - "IntegerListQueue.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "Options.h"
-#include "Files.h"
-
-int main(int argc, char** argv) {
-
-    //Option parsing.
-    setFlags(argc, argv);
-
-    readInFile();
+struct IntegerListQueue {
+    int _numLists;
+    int* listSizes;
+    int** intLists;
+};
 
 
-    return 0;
-}
+
+static struct IntegerListQueue* listsFromInfile;

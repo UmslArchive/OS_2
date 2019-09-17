@@ -10,9 +10,8 @@ File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #include <stdio.h>
 
-extern FILE* inFile;
-extern FILE* outFile;
+extern int numLists;
 
-
+extern int readInFile();
 
 #endif
