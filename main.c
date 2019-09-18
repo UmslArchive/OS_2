@@ -7,11 +7,19 @@ File   - - - "main.c" - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #include "Options.h"
 #include "Files.h"
+#include "IntegerListQueue.h"
 
 int main(int argc, char** argv) {
 
     //Option parsing.
     setFlags(argc, argv);
+
+    if(getFlagState(HELP) == 1) {
+        printf("HELP\n");
+        return 0;
+    }
+
+    initIntegerListQueue();
 
     readInFile();
 

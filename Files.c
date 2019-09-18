@@ -5,18 +5,10 @@ Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
 File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include <string.h>
-
 #include "Files.h"
-#include "Options.h"
-
- //Data to be read from infile.
- int numLists = 0;
 
 static FILE* inFile = NULL;
 static FILE* outFile = NULL;
-
-static char* readNextWord();
 
 int readInFile() {
     //Open the infile as read-only.
@@ -39,12 +31,12 @@ int readInFile() {
         rewind(inFile);
     }
 
-    int currentInt = 0;
+    static int currentInt = 0;
 
     //Read the first line and set numLists.
     if(fscanf(inFile, "%d\n", &currentInt) > 0) {
-        numLists = currentInt;
-        printf("numLists = %d\n", numLists);
+        intListQueue->numLists = currentInt;
+        allocateSizesArray();
     }
     else {
         printf("logParse: Error: Could not read first value from infile\n");
@@ -57,7 +49,7 @@ int readInFile() {
     ssize_t read;
 
     while((read = getline(&line, &len, inFile)) != EOF) {
-        //Parse the line for ints.
+        //Tokenize the line.
         char* token = strtok(line, " ");
         while(token != NULL) {
             printf("%s\n", token);

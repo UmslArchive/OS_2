@@ -5,12 +5,19 @@ Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
 File   - - - "IntegerListQueue.h"  - - - - - - - - - - - - - - - - - - - - - -  
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-struct IntegerListQueue {
-    int _numLists;
-    int* listSizes;
-    int** intLists;
-};
+#include "IntegerListQueue.h"
 
+void initIntegerListQueue() {
+    intListQueue = (struct IntegerListQueue*)malloc(sizeof(struct IntegerListQueue));
+    intListQueue->numLists = 0;
+    intListQueue->sizes = NULL;
+    intListQueue->lists = NULL;
+}
 
+void allocateSizesArray() {
+    intListQueue->sizes = (int*)malloc(intListQueue->numLists * sizeof(int));
+}
 
-static struct IntegerListQueue* listsFromInfile;
+void appendListElement(int listSelect, int item) {
+    
+}

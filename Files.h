@@ -9,6 +9,10 @@ File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #define FILES_H
 
 #include <stdio.h>
+#include <string.h>
+
+#include "Options.h"
+#include "IntegerListQueue.h"
 
 extern int numLists;
 
