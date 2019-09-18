@@ -7,6 +7,10 @@ File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #include "Files.h"
 
+//Infile data.
+static int numLines = -1;
+static int* currentLineArray = NULL;
+
 static FILE* inFile = NULL;
 static FILE* outFile = NULL;
 
@@ -35,8 +39,7 @@ int readInFile() {
 
     //Read the first line and set numLists.
     if(fscanf(inFile, "%d\n", &currentInt) > 0) {
-        intListQueue->numLists = currentInt;
-        allocateSizesArray();
+        numLines = currentInt;
     }
     else {
         printf("logParse: Error: Could not read first value from infile\n");

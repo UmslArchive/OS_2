@@ -50,6 +50,7 @@ void setFlags(const int argc, char** argv) {
 
     //DEBUG
     //printFlagArray();
+    
 }
 
 int getFlagState(int flag) {

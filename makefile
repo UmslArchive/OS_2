@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -I. -g
 TARGET = logParse
-OBJS = main.o Options.o Files.o IntegerListQueue.o
+OBJS = main.o Options.o Files.o
 .SUFFIXES: .c .o
 
 $(TARGET): $(OBJS)
