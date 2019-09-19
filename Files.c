@@ -67,6 +67,7 @@ int readInFile() {
     int* intArr = NULL;
     int size;
     int* cpids = NULL;
+    int ppid = -1;
     int numChildren = 0;
 
     for(i = 0; i < numLines; ++i) {
@@ -79,6 +80,7 @@ int readInFile() {
         }
 
         if(pid != 0) {
+            ppid = getpid();
             //printf("pid: %d\n", pid);
             ++numChildren;
             //printf("children: %d\n", numChildren);
@@ -171,9 +173,11 @@ int readInFile() {
 
     }
 
+    //DEBUG
     for(i = 0; i < numChildren; ++i) {
         printf("Child #%d PID = %d\n", i, cpids[i]);
     }
+    printf("ppid: %d\n", ppid);
 
     //Cleanup.
     free((int*)cpids);
