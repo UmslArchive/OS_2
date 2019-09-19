@@ -15,9 +15,6 @@ static int* currentLineArray = NULL;
 static FILE* inFile = NULL;
 static FILE* outFile = NULL;
 
-//Helper functions.
-int* createIntArrayFromLine(const char* line, const int len, int* arr);
-
 int* test() {
     printf("test Function ran\n");
 }
@@ -60,15 +57,17 @@ int readInFile() {
     fclose(inFile);
     inFile = NULL;
 
+    //Fork loop.
     int i;
     pid_t pid;
     int wstatus;
     int offset = 0;
-
     char* line = NULL;
     size_t len = 0;
-
     int* intArr = NULL;
+    int size;
+    int* cpids = NULL;
+    int numChildren = 0;
 
     for(i = 0; i < numLines; ++i) {
         pid = fork();
@@ -79,17 +78,83 @@ int readInFile() {
             exit(EXIT_FAILURE);
         }
 
-        //Child process.
+        if(pid != 0) {
+            //printf("pid: %d\n", pid);
+            ++numChildren;
+            //printf("children: %d\n", numChildren);
+            cpids = (int*) realloc((int*)cpids, (size_t)numChildren);
+            cpids[numChildren - 1] = pid;
+        }
+
         if(pid == 0) {
-            printf("pid: %d\n", getpid());
+            //printf("pid: %d\n", getpid());
             inFile = fopen(getFlagArg(INPUT_FILE), "r");
 
+            //Seek to start of line and get the line.
             fseek(inFile, offset + skipFirst, SEEK_SET);
             getline(&line, &len, inFile);
 
-            printf("outer: %s", line);
+            //Set new offset.
+            offset = ftell(inFile) - 2; //-2 just because.
 
-            createIntArrayFromLine(line, len, intArr);
+            fclose(inFile);
+            inFile = NULL;
+
+            //Code between these lines tokenizes the line returned by getline 
+            //and sticks the integers into an array.
+            //---------------------------
+
+            char* lineCopy = (char*) malloc(len * sizeof(char));
+
+            //copy line into lineCopy.
+            int i;
+            for(i = 0; i < len; ++i) {
+                lineCopy[i] = line[i];
+            }
+
+            /* Get number of tokens in lineCopy... */
+            int numInts = 0;
+            int scannerState = 0; //Out-of-a-word(0) vs in-a-word(1)
+            
+            //for every character in the line.
+            for(i = 0; i < len; ++i) {
+
+                //If non-digit on ascii...
+                if((int)lineCopy[i] > 57 || (int)lineCopy[i] < 48) {
+                    scannerState = 0;
+                }
+
+                //Otherwise in a word.
+                else if(scannerState == 0) {
+                    scannerState = 1;
+                    ++numInts;
+                }
+            }
+
+            //Allocate the array.
+            intArr = (int*)calloc(numInts, sizeof(int));
+
+            i = 0;
+            char* token;
+            token = strtok(lineCopy, " \n");
+            while(token != NULL) {
+                intArr[i] = atoi(token);
+                token = strtok(NULL, " \n");
+                ++i;
+            }
+
+            //DEBUG
+            printf("ArrayInts: ");
+            for(i = 0; i < numInts; ++i) {
+                printf("%d ", intArr[i]);
+            }
+            printf("\n");
+
+            //Cleanup.
+            free(lineCopy);
+            lineCopy = NULL;
+
+            //----------------------------------
 
             //Run the alg....
 
@@ -98,9 +163,6 @@ int readInFile() {
             intArr = NULL;
 
             //Return current position of file pointer as offset.
-            offset = ftell(inFile) - 2; //-2 because reasons.
-            fclose(inFile);
-            inFile = NULL;
             exit(offset);
         }
         
@@ -108,82 +170,14 @@ int readInFile() {
         offset = WEXITSTATUS(wstatus);
 
     }
-    printf("\n");
 
-    return 0;
-}
-
-int* createIntArrayFromLine(const char* line, const int len, int * arr) {
-    char* lineCopy = (char*) malloc(len * sizeof(char));
-
-    //copy line into lineCopy.
-    int i;
-    for(i = 0; i < len; ++i) {
-        lineCopy[i] = line[i];
+    for(i = 0; i < numChildren; ++i) {
+        printf("Child #%d PID = %d\n", i, cpids[i]);
     }
-
-    printf("Inner: ");
-    for(i = 0; i < len; ++i) {
-        printf("%c", lineCopy[i]);
-    }
-
-    //Get number of tokens in lineCopy.
-    int numInts = 0;
-    int scannerState = 0; //Out of a word.
-    
-    //for every character in the line.
-    for(i = 0; i < len; ++i) {
-
-        //If non digit on ascii...
-        if((int)lineCopy[i] > 57 || (int)lineCopy[i] < 48) {
-            scannerState = 0;
-        }
-
-        //Otherwise in a word.
-        else if(scannerState == 0) {
-            scannerState = 1;
-            ++numInts;
-        }
-    }
-
-    //Allocate the array.
-    arr = (int*)calloc(numInts, sizeof(int));
-
-    //Tokenize lineCopy.
-    /* scannerState = 0;
-    char token[256];
-    int tokenLen = 0;
-    for(i = 0; i < len; ++i) {
-        if((int)lineCopy[i] > 57 || (int)lineCopy[i] < 48) {
-            scannerState = 0;
-        }
-        else if(scannerState == 0) {
-            scannerState = 1;
-        }
-
-        if(scannerState == 1) {
-
-        }
-    } */
-
-    i = 0;
-    char* token;
-    token = strtok(lineCopy, " \n");
-    while(token != NULL) {
-        arr[i] = atoi(token);
-        token = strtok(NULL, " \n");
-        ++i;
-    }
-
-    printf("arrayInts: ");
-    for(i = 0; i < numInts; ++i) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
 
     //Cleanup.
-    free(lineCopy);
-    lineCopy = NULL;
+    free((int*)cpids);
+    cpids = NULL;
 
-    return NULL;
+    return 0;
 }
