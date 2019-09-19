@@ -2,7 +2,7 @@
 Author - - - Colby Ackerman - - - - - - - - - - - - - - - - - - - - - - - - - -
 Class  - - - Operating Systems (CS4760) - - - - - - - - - - - - - - - - - - - -
 Date   - - - Sep. 14, 2019  - - - - - - - - - - - - - - - - - - - - - - - - - -
-File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+File   - - - "Files.c"  - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "Files.h"
@@ -16,7 +16,11 @@ static FILE* inFile = NULL;
 static FILE* outFile = NULL;
 
 //Helper functions.
-static int* createIntArrayFromLine(char* line);
+int* createIntArrayFromLine(const char* line, const int len, int* arr);
+
+int* test() {
+    printf("test Function ran\n");
+}
 
 int readInFile() {
     //Open the infile as read-only.
@@ -53,36 +57,50 @@ int readInFile() {
     //during forking.
     int skipFirst = ftell(inFile);
 
+    fclose(inFile);
+    inFile = NULL;
+
     int i;
-    pid_t pid, cpid, w;
-    int wstatus = 0;
+    pid_t pid;
+    int wstatus;
     int offset = 0;
 
+    char* line = NULL;
+    size_t len = 0;
+
+    int* intArr = NULL;
+
     for(i = 0; i < numLines; ++i) {
-        cpid = fork();
+        pid = fork();
 
         //Fork error handler.
-        if(cpid < 0) {
+        if(pid < 0) {
             perror("logParse: Error: Fork");
             exit(EXIT_FAILURE);
         }
 
         //Child process.
-        if(cpid == 0) {
-            char* line = NULL;
-            int numInts = 0;
-            size_t len = 0;
+        if(pid == 0) {
+            printf("pid: %d\n", getpid());
+            inFile = fopen(getFlagArg(INPUT_FILE), "r");
 
             fseek(inFile, offset + skipFirst, SEEK_SET);
             getline(&line, &len, inFile);
 
-            int* intArr = createIntArrayFromLine(line);
+            printf("outer: %s", line);
 
+            createIntArrayFromLine(line, len, intArr);
 
-            printf("%s", line);
+            //Run the alg....
+
+            //Cleanup.
+            free(intArr);
+            intArr = NULL;
 
             //Return current position of file pointer as offset.
-            offset = ftell(inFile);
+            offset = ftell(inFile) - 2; //-2 because reasons.
+            fclose(inFile);
+            inFile = NULL;
             exit(offset);
         }
         
@@ -90,12 +108,82 @@ int readInFile() {
         offset = WEXITSTATUS(wstatus);
 
     }
-
     printf("\n");
 
     return 0;
 }
 
-static int* createIntArrayFromLine(char* line) {
+int* createIntArrayFromLine(const char* line, const int len, int * arr) {
+    char* lineCopy = (char*) malloc(len * sizeof(char));
 
+    //copy line into lineCopy.
+    int i;
+    for(i = 0; i < len; ++i) {
+        lineCopy[i] = line[i];
+    }
+
+    printf("Inner: ");
+    for(i = 0; i < len; ++i) {
+        printf("%c", lineCopy[i]);
+    }
+
+    //Get number of tokens in lineCopy.
+    int numInts = 0;
+    int scannerState = 0; //Out of a word.
+    
+    //for every character in the line.
+    for(i = 0; i < len; ++i) {
+
+        //If non digit on ascii...
+        if((int)lineCopy[i] > 57 || (int)lineCopy[i] < 48) {
+            scannerState = 0;
+        }
+
+        //Otherwise in a word.
+        else if(scannerState == 0) {
+            scannerState = 1;
+            ++numInts;
+        }
+    }
+
+    //Allocate the array.
+    arr = (int*)calloc(numInts, sizeof(int));
+
+    //Tokenize lineCopy.
+    /* scannerState = 0;
+    char token[256];
+    int tokenLen = 0;
+    for(i = 0; i < len; ++i) {
+        if((int)lineCopy[i] > 57 || (int)lineCopy[i] < 48) {
+            scannerState = 0;
+        }
+        else if(scannerState == 0) {
+            scannerState = 1;
+        }
+
+        if(scannerState == 1) {
+
+        }
+    } */
+
+    i = 0;
+    char* token;
+    token = strtok(lineCopy, " \n");
+    while(token != NULL) {
+        arr[i] = atoi(token);
+        token = strtok(NULL, " \n");
+        ++i;
+    }
+
+    printf("arrayInts: ");
+    for(i = 0; i < numInts; ++i) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    //Cleanup.
+    free(lineCopy);
+    lineCopy = NULL;
+
+    return NULL;
 }
