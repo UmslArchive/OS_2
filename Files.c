@@ -15,9 +15,7 @@ static int* currentLineArray = NULL;
 static FILE* inFile = NULL;
 static FILE* outFile = NULL;
 
-int* test() {
-    printf("test Function ran\n");
-}
+void subsetSum(int* set, int setLen);
 
 int readInFile() {
     //Open the infile as read-only.
@@ -159,6 +157,7 @@ int readInFile() {
             //----------------------------------
 
             //Run the alg....
+            subsetSum(intArr, numInts);
 
             //Cleanup.
             free(intArr);
@@ -184,4 +183,13 @@ int readInFile() {
     cpids = NULL;
 
     return 0;
+}
+
+void subsetSum(int* set, int setLen) {
+    int i;
+    printf("set: ");
+    for(i = 0; i < setLen; ++i) {
+        printf("%d ", set[i]);
+    }
+    printf("\n");
 }
