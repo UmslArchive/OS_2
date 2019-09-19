@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I. -g
+CFLAGS = -I. -g -lm
 TARGET = logParse
 OBJS = main.o Options.o Files.o
 .SUFFIXES: .c .o

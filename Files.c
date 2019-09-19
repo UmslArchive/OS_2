@@ -15,7 +15,8 @@ static int* currentLineArray = NULL;
 static FILE* inFile = NULL;
 static FILE* outFile = NULL;
 
-void subsetSum(const int* set, int setLen);
+void subsetSum(int* set, int* subSet, int n, int subSize, int total, int nodeCount, int sum);
+void findSubset(int set[], int size, int sum);
 
 int readInFile() {
     //Open the infile as read-only.
@@ -95,7 +96,7 @@ int readInFile() {
             getline(&line, &len, inFile);
 
             //Set new offset.
-            offset = ftell(inFile) - 2; //-2 just because.
+            offset = ftell(inFile) - skipFirst; //-2 just because.
 
             fclose(inFile);
             inFile = NULL;
@@ -157,7 +158,7 @@ int readInFile() {
             //----------------------------------
 
             //Run the alg....
-            subsetSum(intArr, numInts);
+            findSubset(intArr + 1, numInts - 1, intArr[0]);
 
             //Cleanup.
             free(intArr);
@@ -185,11 +186,32 @@ int readInFile() {
     return 0;
 }
 
-void subsetSum(const int* set, int setLen) {
-    int i;
-    printf("set: ");
-    for(i = 0; i < setLen; ++i) {
-        printf("%d ", set[i]);
-    }
+void displaySubset(int* subSet, int size) {
+    int j;
+    printf("Subset: ");
+    for(j = 0; j < size; ++j)
+        printf("%d ", subSet[j]);
     printf("\n");
+}
+
+void subsetSum(int* set, int* subSet, int n, int subSize, int total, int nodeCount, int sum) {
+    int i;
+    if(total == sum) {
+        displaySubset(subSet, subSize);
+        subsetSum(set, subSet, n, subSize - 1, total - set[nodeCount], nodeCount + 1, sum);
+        return;
+    }
+    else {
+        for(i = nodeCount; i < n; ++i) {
+            subSet[subSize] = set[i];
+            subsetSum(set, subSet, n, subSize + 1, total + set[i], i + 1, sum);
+        }
+    }
+}
+
+void findSubset(int* set, int size, int sum) {
+    int* subSet = (int*)calloc(size, sizeof(int));
+    subsetSum(set, subSet, size, 0, 0, 0, sum);
+    free(subSet);
+    subSet = NULL;
 }
