@@ -1,0 +1,16 @@
+READMEREADMEREADMEREADMEREADMEREADMEREADMEREADMEREADMEREADMEREADMEREADMEREADMER 
+
+Author: Colby Ackerman
+Date: Sep. 19,  2019 
+Class: Operating Systems (CS4760)
+Assignment: (2) Concurrent Unix Processes and Shared Memory
+
+----------------
+
+INSTALL:
+    - execute `make` in bash terminal.
+
+----------------
+
+RETRIEVE FILE HISTORY LOG:
+    - execute `./getLog.sh` in bash terminal.

@@ -12,4 +12,4 @@ $(TARGET): $(OBJS)
 
 .PHONY: clean
 clean:
-	rm -f *.o $(TARGET) *.dat
+	rm -f *.o $(TARGET) *.dat log.txt
