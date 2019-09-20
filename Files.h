@@ -15,6 +15,8 @@ File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <math.h>
+#include <signal.h>
+#include <time.h>
 
 
 #include "Options.h"

@@ -28,4 +28,6 @@ void setFlags(const int argc, char** argv);
 int getFlagState(int flag);
 char* getFlagArg(int flag);
 
+extern int timeParam;
+
 #endif

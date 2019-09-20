@@ -13,7 +13,7 @@ static void printFlagArray(); //DEBUG
 
 static char* inputFileParam = "input.dat";
 static char* outputFileParam = "output.dat";
-static int timeParam = 10;
+int timeParam = 10;
 
 //Initialize flags to 0.
 static void initFlags() {
