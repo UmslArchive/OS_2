@@ -22,12 +22,13 @@ clock_t childTimeStart;
 clock_t childTimeStop;
 double elapsed = 0;
 
-void subsetSum(int* set, int* subSet, int n, int subSize, int total, int nodeCount, int sum);
-void findSubset(int set[], int size, int sum);
+void subsetSum(int* set, int* subSet, int n, int subSize, int total, int nodeCount, int sum, int pid);
+void findSubset(int set[], int size, int sum, int pid);
+
+void mySubset(int* arr, int size, int sum, int pid);
 
 void parentSignalListener(int sig);
 void childSignalListener(int sig);
-void killChildren(int* children);
 
 int readInFile() {
     //Open the infile as read-only.
@@ -171,7 +172,8 @@ int readInFile() {
             //----------------------------------
 
             //Run the alg....
-            findSubset(intArr + 1, numInts - 1, intArr[0]);
+            //findSubset(intArr + 1, numInts - 1, intArr[0], getpid());
+            mySubset(intArr + 1, numInts -1, intArr[0], getpid());
 
             //Cleanup.
             free(intArr);
@@ -211,34 +213,99 @@ int readInFile() {
     return 0;
 }
 
-void displaySubset(int* subSet, int size) {
+void displaySubset(int* subSet, int size, int pid) {
     int j;
-    printf("Subset: ");
+    printf("PID %d: Subset{ ", pid);
     for(j = 0; j < size; ++j)
         printf("%d ", subSet[j]);
-    printf("\n");
+    printf("}\n");
 }
 
-void subsetSum(int* set, int* subSet, int n, int subSize, int total, int nodeCount, int sum) {
-    int i;
+void subsetSum(int set[], int* subSet, int n, int subSize, int total, int nodeCount, int sum, int pid) {
     if(total == sum) {
-        displaySubset(subSet, subSize);
-        subsetSum(set, subSet, n, subSize - 1, total - set[nodeCount], nodeCount + 1, sum);
+        displaySubset(subSet, subSize, pid);
+        subsetSum(set, subSet, n, subSize - 1, total - set[nodeCount], nodeCount + 1, sum, pid);
         return;
     }
     else {
+        int i;
+        subSet = (int*)realloc(subSet, n * sizeof(int));
         for(i = nodeCount; i < n; ++i) {
             subSet[subSize] = set[i];
-            subsetSum(set, subSet, n, subSize + 1, total + set[i], i + 1, sum);
+            subsetSum(set, subSet, n, subSize + 1, total + set[i], i + 1, sum, pid);
         }
     }
 }
 
-void findSubset(int* set, int size, int sum) {
-    int* subSet = (int*)calloc(size, sizeof(int));
-    subsetSum(set, subSet, size, 0, 0, 0, sum);
+void findSubset(int* set, int size, int sum, int pid) {
+    printf("Sum: %d : ", sum);
+    int* subSet = NULL;
+    subsetSum(set, subSet, size, 0, 0, 0, sum, pid);
     free(subSet);
     subSet = NULL;
+}
+
+void mySubset(int* arr, int size, int sum, int pid) {
+    int foundSubset = 0;
+    long i, j, k;
+    long numSets = (long)pow(2.0, size);
+    long* indexArray = (long*)calloc(size, sizeof(long));
+
+    //init indexarray
+    for(i = 0; i < size; ++i) {
+        indexArray[i] = 0;
+    }
+    i = 0;
+
+    for(i = 0; i < size; ++i) {
+        indexArray[i] = 0;
+    }
+    i = 0;
+    //printArray(indexArray, size);
+
+    //Iterate over all possible subsets.
+    for(i = 0; i < (1 << size); ++i) {
+        //Iterate through the bits up to size number of bits.
+        long mask = 1;
+        for(j = 0; j < size; ++j) {
+            //flip the value in indexArray which corresponds to the bit position
+            if((i & (1 << j)) > 0) {
+                indexArray[j] = 1;
+            }
+            mask = mask << 1;
+
+            //Check total.
+            int total = 0;
+            for(k = 0; k < size; ++k) {
+                if(indexArray[k] == 1) {
+                    total = total + arr[k];
+                }
+            }
+
+            //Ouput if total == sum.
+            if(total == sum) {
+                foundSubset = 1;
+                printf("subset: ");
+                for(k = 0; k < size; ++k) {
+                    if(indexArray[k] == 1) {
+                        printf("%d ", arr[k]);
+                    }
+                }
+                printf("\n");
+            }
+
+        }
+        //printArray(indexArray, size);
+        //Reset indexArray.
+        for(k = 0; k < size; ++k) {
+            indexArray[k] = 0;
+        }
+
+    }
+    if(foundSubset == 0) {
+        printf("%d: No subset of numbers summed to %d.\n", pid, sum);
+    }
+    
 }
 
 void parentSignalListener(int sig) {
@@ -259,8 +326,4 @@ void childSignalListener(int sig) {
     if(sig == SIGTERM) {
         //Die peacefully.
     }
-}
-
-void killChildren(int* children) {
-
 }
