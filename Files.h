@@ -23,6 +23,6 @@ File   - - - "Files.h"  - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 extern int numLists;
 
-extern int readInFile();
+extern int run();
 
 #endif

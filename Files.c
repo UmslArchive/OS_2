@@ -30,9 +30,12 @@ void mySubset(int* arr, int size, int sum, int pid);
 void parentSignalListener(int sig);
 void childSignalListener(int sig);
 
-int readInFile() {
+int run() {
     //Open the infile as read-only.
     inFile = fopen(getFlagArg(INPUT_FILE), "r");
+
+    //Remove outfile if it exists.
+    remove(getFlagArg(OUTPUT_FILE));
 
     //Check if file exists.
     if(inFile == NULL) {
@@ -100,7 +103,7 @@ int readInFile() {
             //Set time limit for child processing life to 1 second.
             alarm(1);
             signal(SIGALRM, childSignalListener);
-            printf("cpid = %d waiting for alarm.\n", getpid());
+            //printf("cpid = %d waiting for alarm.\n", getpid());
            
             //printf("pid: %d\n", getpid());
             inFile = fopen(getFlagArg(INPUT_FILE), "r");
@@ -159,11 +162,11 @@ int readInFile() {
             }
 
             //DEBUG
-            printf("ArrayInts: ");
+            /* printf("ArrayInts: ");
             for(i = 0; i < numInts; ++i) {
                 printf("%d ", intArr[i]);
             }
-            printf("\n");
+            printf("\n"); */
 
             //Cleanup.
             free(lineCopy);
@@ -172,8 +175,7 @@ int readInFile() {
             //----------------------------------
 
             //Run the alg....
-            //findSubset(intArr + 1, numInts - 1, intArr[0], getpid());
-            mySubset(intArr + 1, numInts -1, intArr[0], getpid());
+            mySubset(intArr + 1, numInts - 1, intArr[0], getpid());
 
             //Cleanup.
             free(intArr);
@@ -189,9 +191,8 @@ int readInFile() {
         //Stop the clock after the child has been waited on.
         if(pid > 0) {
             childTimeStop = time(NULL);
-            printf("childTimeStop: %ld\n", childTimeStop);
+            //printf("childTimeStop: %ld\n", childTimeStop);
             elapsed = (double)(childTimeStop - childTimeStart);
-            printf("Elapsed time: %f\n", elapsed);
 
             if(elapsed >= timeParam) {
                 exit(0);
@@ -200,49 +201,27 @@ int readInFile() {
 
     }
 
-    //DEBUG
+    outFile = fopen(getFlagArg(OUTPUT_FILE), "a");
+    printf("Total elapsed time: %d seconds\n", (int)elapsed);
+    fprintf(outFile, "Total elapsed time: %d seconds\n", (int)elapsed);
+
+    //Output process IDs
+    printf("\nProcesses that ran:\n");
+    fprintf(outFile, "\nProcesses that ran:\n");
     for(i = 0; i < numChildren; ++i) {
         printf("Child #%d PID = %d\n", i, cpids[i]);
+        fprintf(outFile, "Child #%d PID = %d\n", i, cpids[i]);
     }
-    printf("ppid: %d\n", ppid);
+    printf("Parent PID: %d\n", ppid);
+    fprintf(outFile, "Parent PID: %d\n", ppid);
+
+    fclose(outFile);
 
     //Cleanup.
     free((int*)cpids);
     cpids = NULL;
 
     return 0;
-}
-
-void displaySubset(int* subSet, int size, int pid) {
-    int j;
-    printf("PID %d: Subset{ ", pid);
-    for(j = 0; j < size; ++j)
-        printf("%d ", subSet[j]);
-    printf("}\n");
-}
-
-void subsetSum(int set[], int* subSet, int n, int subSize, int total, int nodeCount, int sum, int pid) {
-    if(total == sum) {
-        displaySubset(subSet, subSize, pid);
-        subsetSum(set, subSet, n, subSize - 1, total - set[nodeCount], nodeCount + 1, sum, pid);
-        return;
-    }
-    else {
-        int i;
-        subSet = (int*)realloc(subSet, n * sizeof(int));
-        for(i = nodeCount; i < n; ++i) {
-            subSet[subSize] = set[i];
-            subsetSum(set, subSet, n, subSize + 1, total + set[i], i + 1, sum, pid);
-        }
-    }
-}
-
-void findSubset(int* set, int size, int sum, int pid) {
-    printf("Sum: %d : ", sum);
-    int* subSet = NULL;
-    subsetSum(set, subSet, size, 0, 0, 0, sum, pid);
-    free(subSet);
-    subSet = NULL;
 }
 
 void mySubset(int* arr, int size, int sum, int pid) {
@@ -284,14 +263,19 @@ void mySubset(int* arr, int size, int sum, int pid) {
 
             //Ouput if total == sum.
             if(total == sum) {
+                outFile = fopen(getFlagArg(OUTPUT_FILE), "a");
                 foundSubset = 1;
-                printf("subset: ");
+                fprintf(outFile, "PID: %d Sum: %d subset: ", pid, sum);
+                printf("PID: %d Sum: %d subset: ", pid, sum);
                 for(k = 0; k < size; ++k) {
                     if(indexArray[k] == 1) {
                         printf("%d ", arr[k]);
+                        fprintf(outFile, "%d ", arr[k]);
                     }
                 }
                 printf("\n");
+                fprintf(outFile, "\n");
+                fclose(outFile);
             }
 
         }
@@ -305,6 +289,11 @@ void mySubset(int* arr, int size, int sum, int pid) {
     if(foundSubset == 0) {
         printf("%d: No subset of numbers summed to %d.\n", pid, sum);
     }
+
+    outFile = fopen(getFlagArg(OUTPUT_FILE), "a");
+    fprintf(outFile, "\n");
+    fclose(outFile);
+    printf("\n");
     
 }
 
